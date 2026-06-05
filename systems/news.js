@@ -217,25 +217,28 @@ client.on('interactionCreate', async interaction => {
   ) {
 
     newsData.set(
-      interaction.user.id,
-      {
-        title:
-          interaction.fields.getTextInputValue(
-            'title'
-          ),
+  interaction.user.id,
+  {
+    title:
+      interaction.fields.getTextInputValue(
+        'title'
+      ),
 
-        text:
-          interaction.fields.getTextInputValue(
-            'text'
-          ),
+    text:
+      interaction.fields.getTextInputValue(
+        'text'
+      ),
 
-       image: null,
+    image: null,
 
-waitingImage: true,
+    waitingImage: true,
 
-page: 0
+    page: 0
 
-    const row =
+  }
+);
+
+const row =
       new ActionRowBuilder()
         .addComponents(
 
