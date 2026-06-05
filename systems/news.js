@@ -193,6 +193,70 @@ const row =
 
 });
 
+  // SEITEN BUTTONS
+client.on('interactionCreate', async interaction => {
+
+  if (
+    !interaction.isButton()
+  ) return;
+
+  const data =
+    newsData.get(
+      interaction.user.id
+    );
+
+  if (!data) return;
+
+  if (
+    interaction.customId ===
+    'news_next'
+  ) {
+
+    data.page =
+      (data.page || 0) + 1;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildChannelMenu(
+          interaction.guild,
+          data.page
+        )
+    });
+
+  }
+
+  if (
+    interaction.customId ===
+    'news_prev'
+  ) {
+
+    data.page = Math.max(
+      (data.page || 0) - 1,
+      0
+    );
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildChannelMenu(
+          interaction.guild,
+          data.page
+        )
+    });
+
+  }
+
+});
+  
 // CHANNEL AUSWAHL
 client.on('interactionCreate', async interaction => {
 
