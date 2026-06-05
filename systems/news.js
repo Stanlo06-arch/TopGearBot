@@ -189,8 +189,6 @@ client.on('interactionCreate', async interaction => {
 
 });
 
-  });
-
 // CHANNEL AUSWAHL
 client.on('interactionCreate', async interaction => {
 
