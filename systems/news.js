@@ -54,7 +54,7 @@ function buildChannelMenu(guild, page = 0) {
 
   ];
 
-}ß
+}
 
 module.exports = (client) => {
 
@@ -130,59 +130,65 @@ return interaction.followUp({
   ),
   ephemeral: true
 });
+
+}
+
+});
+      
   // MODAL
-  client.on('interactionCreate', async interaction => {
+  // MODAL
+client.on('interactionCreate', async interaction => {
 
-    if (
-      interaction.isModalSubmit() &&
-      interaction.customId === 'news_modal'
-    ) {
+  if (
+    interaction.isModalSubmit() &&
+    interaction.customId === 'news_modal'
+  ) {
 
-      newsData.set(
-        interaction.user.id,
-        {
-          title:
-            interaction.fields.getTextInputValue(
-              'title'
-            ),
+    newsData.set(
+      interaction.user.id,
+      {
+        title:
+          interaction.fields.getTextInputValue(
+            'title'
+          ),
 
-          text:
-            interaction.fields.getTextInputValue(
-              'text'
-            ),
+        text:
+          interaction.fields.getTextInputValue(
+            'text'
+          ),
 
-          image: null,
+        image: null,
 
-          waitingImage: true
-        }
-      );
+        waitingImage: true
+      }
+    );
 
-      const row =
-        new ActionRowBuilder()
-          .addComponents(
+    const row =
+      new ActionRowBuilder()
+        .addComponents(
 
-            new ButtonBuilder()
-              .setCustomId(
-                'skip_news_image'
-              )
-              .setLabel(
-                '⏭️ Bild überspringen'
-              )
-              .setStyle(
-                ButtonStyle.Secondary
-              )
+          new ButtonBuilder()
+            .setCustomId(
+              'skip_news_image'
+            )
+            .setLabel(
+              '⏭️ Bild überspringen'
+            )
+            .setStyle(
+              ButtonStyle.Secondary
+            )
 
-          );
+        );
 
-      return interaction.reply({
-        content:
-          '📸 Bitte ein Bild senden oder überspringen.',
-        components: [row],
-        ephemeral: true
-      });
-    }
+    return interaction.reply({
+      content:
+        '📸 Bitte ein Bild senden oder überspringen.',
+      components: [row],
+      ephemeral: true
+    });
+  }
 
-  });
+});
 
   // BILD EMPFANGEN
   client.on('messageCreate', async message => {
