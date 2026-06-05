@@ -298,6 +298,40 @@ client.on('interactionCreate', async interaction => {
 
 });
 
+  // ROLLEN AUSWAHL
+client.on('interactionCreate', async interaction => {
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId ===
+      'select_news_roles'
+  ) {
+
+    const data =
+      newsData.get(
+        interaction.user.id
+      );
+
+    if (!data) return;
+
+    data.roles =
+      interaction.values;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.reply({
+      content:
+        `✅ ${interaction.values.length} Rollen ausgewählt.`,
+      ephemeral: true
+    });
+
+  }
+
+});
+
   function buildRoleMenu(guild, page = 0) {
 
   const roles = guild.roles.cache
