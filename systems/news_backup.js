@@ -10,10 +10,57 @@ const {
 
 const newsData = new Map();
 
+function buildChannelMenu(guild, page = 0) {
+
+  const channels = guild.channels.cache
+    .filter(channel => channel.isTextBased())
+    .map(channel => ({
+      label: channel.name.slice(0, 100),
+      value: channel.id
+    }));
+
+  const start = page * 25;
+  const end = start + 25;
+
+  const currentChannels =
+    channels.slice(start, end);
+
+  return [
+
+    new ActionRowBuilder().addComponents(
+
+      new StringSelectMenuBuilder()
+        .setCustomId('select_news_channel')
+        .setPlaceholder(
+          `📢 Channel auswählen | Seite ${page + 1}`
+        )
+        .addOptions(currentChannels)
+
+    ),
+
+    new ActionRowBuilder().addComponents(
+
+      new ButtonBuilder()
+        .setCustomId('news_prev')
+        .setLabel('⬅️')
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId('news_next')
+        .setLabel('➡️')
+        .setStyle(ButtonStyle.Secondary)
+
+    )
+
+  ];
+
+}
+
 module.exports = (client) => {
 
   // BUTTON
   client.on('interactionCreate', async interaction => {
+
 
     if (
       interaction.isButton() &&
@@ -70,68 +117,179 @@ module.exports = (client) => {
         data
       );
 
-      return interaction.reply({
-        content:
-          '✅ Banner wird automatisch verwendet.',
-        ephemeral: true
-      });
-    }
+      await interaction.reply({
+  content:
+    '✅ Banner wird automatisch verwendet.',
+  ephemeral: true
+});
 
-  });
+return interaction.followUp({
+  content: '📢 Channel auswählen:',
+  components: buildChannelMenu(
+    interaction.guild,
+    0
+  ),
+  ephemeral: true
+});
 
+}
+
+});
+      
   // MODAL
-  client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async interaction => {
 
-    if (
-      interaction.isModalSubmit() &&
-      interaction.customId === 'news_modal'
-    ) {
+  if (
+    interaction.isModalSubmit() &&
+    interaction.customId === 'news_modal'
+  ) {
 
-      newsData.set(
-        interaction.user.id,
-        {
-          title:
-            interaction.fields.getTextInputValue(
-              'title'
-            ),
+    newsData.set(
+  interaction.user.id,
+  {
+    title:
+      interaction.fields.getTextInputValue(
+        'title'
+      ),
 
-          text:
-            interaction.fields.getTextInputValue(
-              'text'
-            ),
+    text:
+      interaction.fields.getTextInputValue(
+        'text'
+      ),
 
-          image: null,
+    image: null,
 
-          waitingImage: true
-        }
+    waitingImage: true,
+
+    page: 0
+
+  }
+);
+
+const row =
+      new ActionRowBuilder()
+        .addComponents(
+
+          new ButtonBuilder()
+            .setCustomId(
+              'skip_news_image'
+            )
+            .setLabel(
+              '⏭️ Bild überspringen'
+            )
+            .setStyle(
+              ButtonStyle.Secondary
+            )
+
+        );
+
+    return interaction.reply({
+      content:
+        '📸 Bitte ein Bild senden oder überspringen.',
+      components: [row],
+      ephemeral: true
+    });
+  }
+
+});
+
+  // SEITEN BUTTONS
+client.on('interactionCreate', async interaction => {
+
+  if (
+    !interaction.isButton()
+  ) return;
+
+  const data =
+    newsData.get(
+      interaction.user.id
+    );
+
+  if (!data) return;
+
+  if (
+    interaction.customId ===
+    'news_next'
+  ) {
+
+    data.page =
+      (data.page || 0) + 1;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildChannelMenu(
+          interaction.guild,
+          data.page
+        )
+    });
+
+  }
+
+  if (
+    interaction.customId ===
+    'news_prev'
+  ) {
+
+    data.page = Math.max(
+      (data.page || 0) - 1,
+      0
+    );
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildChannelMenu(
+          interaction.guild,
+          data.page
+        )
+    });
+
+  }
+
+});
+  
+// CHANNEL AUSWAHL
+client.on('interactionCreate', async interaction => {
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId ===
+      'select_news_channel'
+  ) {
+
+    const data =
+      newsData.get(
+        interaction.user.id
       );
 
-      const row =
-        new ActionRowBuilder()
-          .addComponents(
+    if (!data) return;
 
-            new ButtonBuilder()
-              .setCustomId(
-                'skip_news_image'
-              )
-              .setLabel(
-                '⏭️ Bild überspringen'
-              )
-              .setStyle(
-                ButtonStyle.Secondary
-              )
+    data.channelId =
+      interaction.values[0];
 
-          );
+    newsData.set(
+      interaction.user.id,
+      data
+    );
 
-      return interaction.reply({
-        content:
-          '📸 Bitte ein Bild senden oder überspringen.',
-        components: [row],
-        ephemeral: true
-      });
-    }
+    return interaction.reply({
+      content:
+        '✅ Channel ausgewählt.',
+      ephemeral: true
+    });
 
-  });
+  }
+
+});
 
   // BILD EMPFANGEN
   client.on('messageCreate', async message => {
