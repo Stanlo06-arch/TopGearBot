@@ -163,7 +163,9 @@ waitingImage: true,
 
 page: 0,
 
-roles: []
+roles: [],
+
+users: []
 
   }
 );
@@ -448,6 +450,40 @@ client.on('interactionCreate', async interaction => {
           )
 
       ],
+      ephemeral: true
+    });
+
+  }
+
+});
+
+  // USER SPEICHERN
+client.on('interactionCreate', async interaction => {
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId ===
+      'select_news_users'
+  ) {
+
+    const data =
+      newsData.get(
+        interaction.user.id
+      );
+
+    if (!data) return;
+
+    data.users =
+      interaction.values;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.reply({
+      content:
+        `✅ ${interaction.values.length} Benutzer ausgewählt.\n\n👀 Vorschau folgt als Nächstes.`,
       ephemeral: true
     });
 
