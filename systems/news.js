@@ -385,6 +385,76 @@ client.on('interactionCreate', async interaction => {
 
 }
 
+  // USER AUSWAHL
+client.on('interactionCreate', async interaction => {
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId ===
+      'select_news_roles'
+  ) {
+
+    const data =
+      newsData.get(
+        interaction.user.id
+      );
+
+    if (!data) return;
+
+    data.roles =
+      interaction.values;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    const members =
+      interaction.guild.members.cache
+        .filter(member => !member.user.bot)
+        .first(25);
+
+    const options =
+      members.map(member => ({
+        label:
+          member.user.username.slice(
+            0,
+            100
+          ),
+        value: member.id
+      }));
+
+    return interaction.reply({
+      content:
+        '👤 Benutzer auswählen:',
+      components: [
+
+        new ActionRowBuilder()
+          .addComponents(
+
+            new StringSelectMenuBuilder()
+              .setCustomId(
+                'select_news_users'
+              )
+              .setPlaceholder(
+                '👤 Benutzer auswählen'
+              )
+              .setMinValues(1)
+              .setMaxValues(
+                options.length
+              )
+              .addOptions(options)
+
+          )
+
+      ],
+      ephemeral: true
+    });
+
+  }
+
+});
+
   // BILD EMPFANGEN
   client.on('messageCreate', async message => {
 
