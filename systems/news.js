@@ -189,6 +189,42 @@ client.on('interactionCreate', async interaction => {
 
 });
 
+  });
+
+// CHANNEL AUSWAHL
+client.on('interactionCreate', async interaction => {
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId ===
+      'select_news_channel'
+  ) {
+
+    const data =
+      newsData.get(
+        interaction.user.id
+      );
+
+    if (!data) return;
+
+    data.channelId =
+      interaction.values[0];
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.reply({
+      content:
+        '✅ Channel ausgewählt.',
+      ephemeral: true
+    });
+
+  }
+
+});
+
   // BILD EMPFANGEN
   client.on('messageCreate', async message => {
 
