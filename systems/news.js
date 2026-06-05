@@ -411,20 +411,22 @@ client.on('interactionCreate', async interaction => {
       data
     );
 
-    const members =
-      interaction.guild.members.cache
-        .filter(member => !member.user.bot)
-        .first(25);
+   const members = await interaction.guild.members.fetch();
 
-    const options =
-      members.map(member => ({
-        label:
-          member.user.username.slice(
-            0,
-            100
-          ),
-        value: member.id
-      }));
+const filteredMembers =
+  [...members.values()]
+    .filter(member => !member.user.bot)
+    .slice(0, 25);
+
+   const options =
+  filteredMembers.map(member => ({
+    label:
+      member.user.username.slice(
+        0,
+        100
+      ),
+    value: member.id
+  }));
 
     return interaction.reply({
       content:
