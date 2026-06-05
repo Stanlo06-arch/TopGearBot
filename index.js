@@ -15,6 +15,7 @@ const client = new Client({
 });
 
 require('./systems/panel')(client);
+require('./systems/news')(client);
 
 client.once('ready', () => {
   console.log(`${client.user.tag} online`);
