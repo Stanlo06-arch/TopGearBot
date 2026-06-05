@@ -14,6 +14,8 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
+require('./systems/panel')(client);
+
 client.once('ready', () => {
   console.log(`${client.user.tag} online`);
 });
