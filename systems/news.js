@@ -136,7 +136,6 @@ return interaction.followUp({
 });
       
   // MODAL
-  // MODAL
 client.on('interactionCreate', async interaction => {
 
   if (
