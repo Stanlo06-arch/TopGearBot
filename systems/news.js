@@ -10,6 +10,52 @@ const {
 
 const newsData = new Map();
 
+function buildChannelMenu(guild, page = 0) {
+
+  const channels = guild.channels.cache
+    .filter(channel => channel.isTextBased())
+    .map(channel => ({
+      label: channel.name.slice(0, 100),
+      value: channel.id
+    }));
+
+  const start = page * 25;
+  const end = start + 25;
+
+  const currentChannels =
+    channels.slice(start, end);
+
+  return [
+
+    new ActionRowBuilder().addComponents(
+
+      new StringSelectMenuBuilder()
+        .setCustomId('select_news_channel')
+        .setPlaceholder(
+          `📢 Channel auswählen | Seite ${page + 1}`
+        )
+        .addOptions(currentChannels)
+
+    ),
+
+    new ActionRowBuilder().addComponents(
+
+      new ButtonBuilder()
+        .setCustomId('news_prev')
+        .setLabel('⬅️')
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId('news_next')
+        .setLabel('➡️')
+        .setStyle(ButtonStyle.Secondary)
+
+    )
+
+  ];
+
+}ß
+
 module.exports = (client) => {
 
   // BUTTON
@@ -70,15 +116,20 @@ module.exports = (client) => {
         data
       );
 
-      return interaction.reply({
-        content:
-          '✅ Banner wird automatisch verwendet.',
-        ephemeral: true
-      });
-    }
+      await interaction.reply({
+  content:
+    '✅ Banner wird automatisch verwendet.',
+  ephemeral: true
+});
 
-  });
-
+return interaction.followUp({
+  content: '📢 Channel auswählen:',
+  components: buildChannelMenu(
+    interaction.guild,
+    0
+  ),
+  ephemeral: true
+});
   // MODAL
   client.on('interactionCreate', async interaction => {
 
