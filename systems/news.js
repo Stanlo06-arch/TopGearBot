@@ -4,7 +4,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle
+  ButtonStyle,
+  StringSelectMenuBuilder
 } = require('discord.js');
 
 const newsData = new Map();
