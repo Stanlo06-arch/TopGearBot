@@ -157,11 +157,13 @@ client.on('interactionCreate', async interaction => {
         'text'
       ),
 
-    image: null,
+   image: null,
 
-    waitingImage: true,
+waitingImage: true,
 
-    page: 0
+page: 0,
+
+roles: []
 
   }
 );
@@ -282,14 +284,72 @@ client.on('interactionCreate', async interaction => {
     );
 
     return interaction.reply({
-      content:
-        '✅ Channel ausgewählt.',
-      ephemeral: true
-    });
+  content:
+    '🎭 Rollen auswählen:',
+  components:
+    buildRoleMenu(
+      interaction.guild,
+      0
+    ),
+  ephemeral: true
+});
 
   }
 
 });
+
+  function buildRoleMenu(guild, page = 0) {
+
+  const roles = guild.roles.cache
+    .filter(role => !role.managed)
+    .map(role => ({
+      label: role.name.slice(0, 100),
+      value: role.id
+    }));
+
+  const start = page * 25;
+  const end = start + 25;
+
+  const currentRoles =
+    roles.slice(start, end);
+
+  return [
+
+    new ActionRowBuilder().addComponents(
+
+      new StringSelectMenuBuilder()
+        .setCustomId('select_news_roles')
+        .setPlaceholder(
+          `🎭 Rollen auswählen | Seite ${page + 1}`
+        )
+        .setMinValues(1)
+        .setMaxValues(
+          Math.min(
+            currentRoles.length,
+            25
+          )
+        )
+        .addOptions(currentRoles)
+
+    ),
+
+    new ActionRowBuilder().addComponents(
+
+      new ButtonBuilder()
+        .setCustomId('roles_prev')
+        .setLabel('⬅️')
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId('roles_next')
+        .setLabel('➡️')
+        .setStyle(ButtonStyle.Secondary)
+
+    )
+
+  ];
+
+}
 
   // BILD EMPFANGEN
   client.on('messageCreate', async message => {
