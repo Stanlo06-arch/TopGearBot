@@ -385,10 +385,10 @@ const filteredMembers =
     .filter(member => !member.user.bot)
     .slice(0, 25);
 
-   const options =
+  const options =
   filteredMembers.map(member => ({
     label:
-      member.user.username.slice(
+      member.displayName.slice(
         0,
         100
       ),
