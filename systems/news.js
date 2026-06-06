@@ -216,8 +216,16 @@ client.on('interactionCreate', async interaction => {
     'news_next'
   ) {
 
-    data.page =
-      (data.page || 0) + 1;
+    const maxPage = Math.ceil(
+  interaction.guild.channels.cache
+    .filter(c => c.isTextBased())
+    .size / 25
+) - 1;
+
+data.page = Math.min(
+  (data.page || 0) + 1,
+  maxPage
+);
 
     newsData.set(
       interaction.user.id,
