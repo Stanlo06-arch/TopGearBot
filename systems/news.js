@@ -395,7 +395,7 @@ const filteredMembers =
     value: member.id
   }));
 
-    return interaction.followUp({
+    return interaction.reply({
   content:
     '👤 Benutzer auswählen:',
       components: [
