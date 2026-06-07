@@ -7,7 +7,8 @@ const {
 
 const {
   LOGO,
-  BANNER
+  BANNER,
+  STANCE_CHANNEL_ID
 } = require('../config/ids');
 
 module.exports = (client) => {
