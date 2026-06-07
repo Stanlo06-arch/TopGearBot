@@ -8,6 +8,11 @@ const {
   StringSelectMenuBuilder
 } = require('discord.js');
 
+const {
+  LOGO,
+  BANNER
+} = require('../config/ids');
+
 const newsData = new Map();
 
 function buildChannelMenu(guild, page = 0) {
@@ -458,13 +463,112 @@ client.on('interactionCreate', async interaction => {
       data
     );
 
-    return interaction.reply({
-      content:
-        `✅ ${interaction.values.length} Benutzer ausgewählt.\n\n👀 Vorschau folgt als Nächstes.`,
-      ephemeral: true
-    });
+    const previewEmbed = {
+  color: 0x2B65FF,
+  title: data.title,
+  description: data.text,
+  thumbnail: {
+    url: LOGO
+  },
+  image: {
+    url: data.image || BANNER
+  }
+};
+
+const row =
+  new ActionRowBuilder()
+    .addComponents(
+
+      new ButtonBuilder()
+        .setCustomId(
+          'send_news'
+        )
+        .setLabel(
+          '📢 News senden'
+        )
+        .setStyle(
+          ButtonStyle.Success
+        )
+
+    );
+
+return interaction.reply({
+  content:
+    '👀 Vorschau:',
+  embeds: [previewEmbed],
+  components: [row],
+  ephemeral: true
+});
 
   }
+
+});
+
+  client.on('interactionCreate', async interaction => {
+
+  if (!interaction.isButton()) return;
+
+  if (
+    interaction.customId !==
+    'send_news'
+  ) return;
+
+  const data =
+    newsData.get(
+      interaction.user.id
+    );
+
+  if (!data) return;
+
+  const channel =
+    interaction.guild.channels.cache.get(
+      data.channelId
+    );
+
+  if (!channel) {
+    return interaction.reply({
+      content:
+        '❌ Channel nicht gefunden.',
+      ephemeral: true
+    });
+  }
+
+  const mentions = [
+
+    ...(data.roles || [])
+      .map(id => `<@&${id}>`),
+
+    ...(data.users || [])
+      .map(id => `<@${id}>`)
+
+  ].join(' ');
+
+  const embed = {
+    color: 0x2B65FF,
+    title: data.title,
+    description: data.text,
+    thumbnail: {
+      url: LOGO
+    },
+    image: {
+      url: data.image || BANNER
+    }
+  };
+
+  await channel.send({
+    content: mentions,
+    embeds: [embed]
+  });
+
+  newsData.delete(
+    interaction.user.id
+  );
+
+  return interaction.reply({
+    content:
+      '✅ News gesendet.',
+    ephemeral: true
+  });
 
 });
 
