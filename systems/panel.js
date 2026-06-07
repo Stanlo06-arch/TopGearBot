@@ -42,9 +42,8 @@ module.exports = (client) => {
 
       .setTitle('⚙️ TOPGEAR PANEL')
 
-      .setDescription(`
-description:
-`🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)`
+     .setDescription(`
+🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)
 
 Wähle unten eine Aktion aus.
 `)
@@ -55,59 +54,45 @@ Wähle unten eine Aktion aus.
 
       .setTimestamp();
 
-    const row1 =
-      new ActionRowBuilder()
-        .addComponents(
+    const row1 = new ActionRowBuilder()
+.addComponents(
 
-          new ButtonBuilder()
-            .setCustomId('news')
-            .setLabel('📢 News')
-            .setStyle(
-              ButtonStyle.Primary
-            ),
+  new ButtonBuilder()
+    .setCustomId('news')
+    .setLabel('📰 News')
+    .setStyle(ButtonStyle.Primary),
 
-          new ButtonBuilder()
-            .setCustomId('ticket')
-            .setLabel('🎫 Ticket')
-            .setStyle(
-              ButtonStyle.Success
-            ),
+  new ButtonBuilder()
+    .setCustomId('xenon')
+    .setLabel('⚡ Xenon')
+    .setStyle(ButtonStyle.Primary),
 
-          new ButtonBuilder()
-            .setCustomId('stance')
-            .setLabel('📝 Stance')
-            .setStyle(
-              ButtonStyle.Secondary
-            )
+  new ButtonBuilder()
+    .setCustomId('stance')
+    .setLabel('🚗 Stance')
+    .setStyle(ButtonStyle.Primary),
 
-        );
+  new ButtonBuilder()
+    .setCustomId('urlaub')
+    .setLabel('🌴 Urlaub')
+    .setStyle(ButtonStyle.Success),
 
-    const row2 =
-      new ActionRowBuilder()
-        .addComponents(
+);
 
-          new ButtonBuilder()
-            .setCustomId('urlaub')
-            .setLabel('🌴 Urlaub')
-            .setStyle(
-              ButtonStyle.Secondary
-            ),
+const row2 = new ActionRowBuilder()
+.addComponents(
 
-          new ButtonBuilder()
-            .setCustomId('sanktion')
-            .setLabel('⛔ Sanktion')
-            .setStyle(
-              ButtonStyle.Danger
-            ),
+  new ButtonBuilder()
+    .setCustomId('sanktion')
+    .setLabel('🔨 Sanktion')
+    .setStyle(ButtonStyle.Danger)
 
-          new ButtonBuilder()
-            .setCustomId('search')
-            .setLabel('🔍 Suche')
-            .setStyle(
-              ButtonStyle.Secondary
-            )
+  new ButtonBuilder()
+    .setCustomId('suche')
+    .setLabel('🔍 Suche')
+    .setStyle(ButtonStyle.Secondary)
 
-        );
+);
 
     await channel.send({
       embeds: [embed],
