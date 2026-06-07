@@ -43,7 +43,8 @@ module.exports = (client) => {
       .setTitle('⚙️ TOPGEAR PANEL')
 
       .setDescription(`
-Verwaltung • Mitarbeiter • Systeme
+description:
+`🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)`
 
 Wähle unten eine Aktion aus.
 `)
