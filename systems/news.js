@@ -11,6 +11,68 @@ const {
 const newsData = new Map();
 function buildChannelMenu(guild, page = 0) {
 
+  function buildRoleMenu(guild, page = 0) {
+
+  const roles = guild.roles.cache
+    .filter(role => !role.managed)
+    .map(role => ({
+      label: role.name.slice(0, 100),
+      value: role.id
+    }));
+
+  const start = page * 25;
+
+  const current =
+    roles.slice(
+      start,
+      start + 25
+    );
+
+  return [
+
+    new ActionRowBuilder()
+      .addComponents(
+
+        new StringSelectMenuBuilder()
+          .setCustomId(
+            'select_news_roles'
+          )
+          .setPlaceholder(
+            `🎭 Rollen | Seite ${page + 1}`
+          )
+          .setMinValues(1)
+          .setMaxValues(current.length)
+          .addOptions(current)
+
+      ),
+
+    new ActionRowBuilder()
+      .addComponents(
+
+        new ButtonBuilder()
+          .setCustomId(
+            'roles_prev'
+          )
+          .setLabel('⬅️')
+          .setStyle(
+            ButtonStyle.Secondary
+          ),
+
+        new ButtonBuilder()
+          .setCustomId(
+            'roles_next'
+          )
+          .setLabel('➡️')
+          .setStyle(
+            ButtonStyle.Secondary
+          )
+
+      )
+
+  ];
+
+}
+
   const channels = guild.channels.cache
     .filter(c => c.isTextBased())
     .map(c => ({
@@ -375,12 +437,116 @@ await message.reply({
       data
     );
 
-    return interaction.reply({
-      content:
-        '✅ Channel gespeichert.',
-      ephemeral: true
-    });
+    data.rolePage = 0;
+
+newsData.set(
+  interaction.user.id,
+  data
+);
+
+return interaction.reply({
+  content:
+    '🎭 Rollen auswählen:',
+  components:
+    buildRoleMenu(
+      interaction.guild,
+      0
+    ),
+  ephemeral: true
+});
 
   });
+  client.on('interactionCreate', async interaction => {
+
+  if (
+    !interaction.isButton()
+  ) return;
+
+  const data =
+    newsData.get(
+      interaction.user.id
+    );
+
+  if (!data) return;
+
+  if (
+    interaction.customId ===
+    'roles_next'
+  ) {
+
+    data.rolePage =
+      (data.rolePage || 0) + 1;
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildRoleMenu(
+          interaction.guild,
+          data.rolePage
+        )
+    });
+
+  }
+
+  if (
+    interaction.customId ===
+    'roles_prev'
+  ) {
+
+    data.rolePage = Math.max(
+      (data.rolePage || 0) - 1,
+      0
+    );
+
+    newsData.set(
+      interaction.user.id,
+      data
+    );
+
+    return interaction.update({
+      components:
+        buildRoleMenu(
+          interaction.guild,
+          data.rolePage
+        )
+    });
+
+  }
+
+});
+  client.on('interactionCreate', async interaction => {
+
+  if (
+    !interaction.isStringSelectMenu() ||
+    interaction.customId !==
+    'select_news_roles'
+  ) return;
+
+  const data =
+    newsData.get(
+      interaction.user.id
+    );
+
+  if (!data) return;
+
+  data.roles =
+    interaction.values;
+
+  newsData.set(
+    interaction.user.id,
+    data
+  );
+
+  return interaction.reply({
+    content:
+      '✅ Rollen gespeichert.',
+    ephemeral: true
+  });
+
+});
   
 };
