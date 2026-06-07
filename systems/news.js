@@ -367,6 +367,104 @@ client.on('interactionCreate', async interaction => {
 
 }
 
+  function buildUserMenu(guild, page = 0) {
+
+  const users = [...guild.members.cache.values()]
+    .filter(member => !member.user.bot)
+    .map(member => ({
+      label: member.displayName.slice(0, 100),
+      value: member.id
+    }));
+
+  const start = page * 25;
+  const end = start + 25;
+
+  const currentUsers =
+    users.slice(start, end);
+
+  return [
+
+    new ActionRowBuilder().addComponents(
+
+      new StringSelectMenuBuilder()
+        .setCustomId('select_news_users')
+        .setPlaceholder(
+          `👤 Benutzer | Seite ${page + 1}`
+        )
+        .setMinValues(1)
+        .setMaxValues(
+          Math.min(currentUsers.length, 2)
+        )
+        .addOptions(currentUsers)
+
+    ),
+
+    new ActionRowBuilder().addComponents(
+
+      new ButtonBuilder()
+        .setCustomId('users_prev')
+        .setLabel('⬅️')
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId('users_next')
+        .setLabel('➡️')
+        .setStyle(ButtonStyle.Secondary)
+
+    )
+
+  ];
+
+  }
+
+  if (
+  interaction.customId ===
+  'users_next'
+) {
+
+  data.userPage =
+    (data.userPage || 0) + 1;
+
+  newsData.set(
+    interaction.user.id,
+    data
+  );
+
+  return interaction.update({
+    components:
+      buildUserMenu(
+        interaction.guild,
+        data.userPage
+      )
+  });
+
+}
+
+if (
+  interaction.customId ===
+  'users_prev'
+) {
+
+  data.userPage = Math.max(
+    (data.userPage || 0) - 1,
+    0
+  );
+
+  newsData.set(
+    interaction.user.id,
+    data
+  );
+
+  return interaction.update({
+    components:
+      buildUserMenu(
+        interaction.guild,
+        data.userPage
+      )
+  });
+
+}
+  
   // USER AUSWAHL
 client.on('interactionCreate', async interaction => {
 
@@ -391,23 +489,23 @@ client.on('interactionCreate', async interaction => {
       data
     );
 
-   const members = await interaction.guild.members.fetch();
+   data.userPage = 0;
 
-const filteredMembers =
-  [...members.values()]
-    .filter(member => !member.user.bot)
-    .slice(0, 25);
+newsData.set(
+  interaction.user.id,
+  data
+);
 
-  const options =
-  filteredMembers.map(member => ({
-    label:
-      member.displayName.slice(
-        0,
-        100
-      ),
-    value: member.id
-  }));
-
+return interaction.reply({
+  content:
+    '👤 Benutzer auswählen:',
+  components:
+    buildUserMenu(
+      interaction.guild,
+      0
+    ),
+  ephemeral: true
+});
     return interaction.reply({
   content:
     '👤 Benutzer auswählen:',
@@ -463,10 +561,12 @@ client.on('interactionCreate', async interaction => {
       data
     );
 
-    const previewEmbed = {
+    const embed = {
   color: 0x2B65FF,
   title: data.title,
-  description: data.text,
+  description: `${data.text}
+
+${mentions}`,
   thumbnail: {
     url: LOGO
   },
@@ -556,9 +656,8 @@ return interaction.reply({
   };
 
   await channel.send({
-    content: mentions,
-    embeds: [embed]
-  });
+  embeds: [embed]
+});
 
   newsData.delete(
     interaction.user.id
