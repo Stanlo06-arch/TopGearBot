@@ -72,7 +72,7 @@ module.exports = (client) => {
       const embed =
         new EmbedBuilder()
 
-          .setColor('#2B65FF')
+         .setColor('#7CFF00')
 
           .setTitle(
             '⚙️ TOPGEAR PANEL'
