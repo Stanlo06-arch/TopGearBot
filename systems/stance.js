@@ -2,64 +2,111 @@ const {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-  ActionRowBuilder
+  ActionRowBuilder,
+  EmbedBuilder
 } = require('discord.js');
 
 const {
+  STANCE_CHANNEL_ID,
   LOGO,
-  BANNER,
-  STANCE_CHANNEL_ID
+  BANNER
 } = require('../config/ids');
+
+const stanceData = new Map();
 
 module.exports = (client) => {
 
-  client.on('interactionCreate', async interaction => {
+  // =====================================
+  // STANCE BUTTON
+  // =====================================
 
-    // BUTTON
-    if (
-      interaction.isButton() &&
-      interaction.customId === 'stance'
-    ) {
+  client.on(
+    'interactionCreate',
+    async interaction => {
 
-      const modal = new ModalBuilder()
-        .setCustomId('stance_modal')
-        .setTitle('🚗 Stance');
+      if (
+        !interaction.isButton() ||
+        interaction.customId !== 'stance'
+      ) {
+        return;
+      }
 
-      const customerInput =
+      const modal =
+        new ModalBuilder()
+          .setCustomId(
+            'stance_modal'
+          )
+          .setTitle(
+            '🚗 Stance'
+          );
+
+      const nameInput =
         new TextInputBuilder()
-          .setCustomId('customer_name')
-          .setLabel('Kunden Name')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
+          .setCustomId(
+            'customer_name'
+          )
+          .setLabel(
+            'Kunden Name'
+          )
+          .setStyle(
+            TextInputStyle.Short
+          )
+          .setRequired(true)
+          .setMaxLength(100);
 
       const plateInput =
         new TextInputBuilder()
-          .setCustomId('plate')
-          .setLabel('Kennzeichen')
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true);
+          .setCustomId(
+            'plate'
+          )
+          .setLabel(
+            'Kennzeichen'
+          )
+          .setStyle(
+            TextInputStyle.Short
+          )
+          .setRequired(true)
+          .setMaxLength(20);
 
       modal.addComponents(
 
         new ActionRowBuilder()
-          .addComponents(customerInput),
+          .addComponents(
+            nameInput
+          ),
 
         new ActionRowBuilder()
-          .addComponents(plateInput)
+          .addComponents(
+            plateInput
+          )
 
       );
 
-      return interaction.showModal(modal);
+      return interaction.showModal(
+        modal
+      );
 
     }
+  );
 
-    // MODAL
-    if (
-      interaction.isModalSubmit() &&
-      interaction.customId === 'stance_modal'
-    ) {
 
-      const customer =
+  // =====================================
+  // MODAL
+  // =====================================
+
+  client.on(
+    'interactionCreate',
+    async interaction => {
+
+      if (
+        !interaction.isModalSubmit() ||
+        interaction.customId !==
+        'stance_modal'
+      ) {
+        return;
+      }
+
+      const customerName =
         interaction.fields.getTextInputValue(
           'customer_name'
         );
@@ -69,38 +116,160 @@ module.exports = (client) => {
           'plate'
         );
 
-      const embed = {
-        color: 0x2B65FF,
-
-        title: '🚗 Stance',
-
-        description:
-`👤 **Kunden Name:** ${customer}
-
-📄 **Kennzeichen:** ${plate}`,
-
-        thumbnail: {
-          url: LOGO
-        },
-
-        image: {
-          url: BANNER
-        },
-
-        footer: {
-          text:
-            `Erstellt von ${interaction.user.username} ${new Date().toLocaleString('de-DE')} | Hostet by 𝔖𝔱𝔞𝔫𝔩𝔢𝔶_𝔯𝔪𝔭.06 ♕`,
-          iconURL:
-            interaction.user.displayAvatarURL()
+      stanceData.set(
+        interaction.user.id,
+        {
+          customerName,
+          plate
         }
-      };
+      );
 
       return interaction.reply({
-        embeds: [embed]
+
+        content:
+          '📸 **Bild senden**\n\nBitte sende jetzt das Bild als normale Discord-Nachricht in diesen Channel.',
+
+        ephemeral: true
+
       });
 
     }
+  );
 
-  });
+
+  // =====================================
+  // BILD EMPFANGEN
+  // =====================================
+
+  client.on(
+    'messageCreate',
+    async message => {
+
+      if (
+        message.author.bot
+      ) {
+        return;
+      }
+
+      const data =
+        stanceData.get(
+          message.author.id
+        );
+
+      if (!data) {
+        return;
+      }
+
+      if (
+        message.attachments.size === 0
+      ) {
+        return;
+      }
+
+      const attachment =
+        message.attachments.first();
+
+      if (
+        !attachment.contentType ||
+        !attachment.contentType.startsWith(
+          'image/'
+        )
+      ) {
+
+        await message.reply(
+          '❌ Bitte sende ein Bild.'
+        );
+
+        return;
+      }
+
+      const channel =
+        message.guild.channels.cache.get(
+          STANCE_CHANNEL_ID
+        );
+
+      if (!channel) {
+
+        await message.reply(
+          '❌ Stance-Channel nicht gefunden.'
+        );
+
+        return;
+      }
+
+      const date =
+        new Date().toLocaleString(
+          'de-DE',
+          {
+            dateStyle: 'short',
+            timeStyle: 'short'
+          }
+        );
+
+      const embed =
+        new EmbedBuilder()
+
+          .setColor(
+            '#7CFF00'
+          )
+
+          .setAuthor({
+            name:
+              'Top Gear Performance'
+          })
+
+          .setTitle(
+            '🚗 Stance'
+          )
+
+          .setDescription(
+            `👤 **Kunden Name**\n` +
+            `${data.customerName}\n\n` +
+
+            `🔢 **Kennzeichen**\n` +
+            `${data.plate}`
+          )
+
+          .setThumbnail(
+            LOGO
+          )
+
+          .setImage(
+            attachment.url
+          )
+
+          .setFooter({
+
+            text:
+              `Erstellt von @${message.author.username} ${date} | Hostet by 𝓘𝓽𝓼  𝓢𝓽𝓪𝓷𝔃𝔂 ♕`,
+
+            iconURL:
+              message.author.displayAvatarURL({
+                extension: 'png',
+                size: 64
+              })
+
+          });
+
+
+      await channel.send({
+        embeds: [
+          embed
+        ]
+      });
+
+
+      // Daten löschen
+      stanceData.delete(
+        message.author.id
+      );
+
+
+      await message.reply(
+        '✅ Stance wurde erstellt.'
+      );
+
+    }
+  );
 
 };
