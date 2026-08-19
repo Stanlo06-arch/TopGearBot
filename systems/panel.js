@@ -2,10 +2,7 @@ const {
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle
+  ButtonStyle
 } = require('discord.js');
 
 const {
@@ -17,7 +14,7 @@ const {
 module.exports = (client) => {
 
   // =====================================
-  // PANEL ERSTELLEN
+  // PANEL BEIM BOT-START ERSTELLEN
   // =====================================
 
   client.once('ready', async () => {
@@ -30,12 +27,15 @@ module.exports = (client) => {
         ).catch(() => null);
 
       if (!channel) {
+
         console.log(
           '❌ Panel-Channel nicht gefunden.'
         );
+
         return;
       }
 
+      // Alte Bot-Nachrichten löschen
       const messages =
         await channel.messages.fetch({
           limit: 100
@@ -47,21 +47,41 @@ module.exports = (client) => {
           message.author.id ===
           client.user.id
         ) {
-          await message.delete().catch(() => {});
+
+          await message
+            .delete()
+            .catch(() => {});
+
         }
 
       }
 
+      // =====================================
+      // EMBED
+      // =====================================
+
       const embed =
         new EmbedBuilder()
+
           .setColor('#2B65FF')
-          .setTitle('⚙️ TOPGEAR PANEL')
+
+          .setTitle(
+            '⚙️ TOPGEAR PANEL'
+          )
+
           .setDescription(
             '🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)\n\n' +
             'Wähle unten eine Aktion aus.'
           )
+
           .setThumbnail(LOGO)
+
           .setImage(BANNER);
+
+
+      // =====================================
+      // REIHE 1
+      // =====================================
 
       const row1 =
         new ActionRowBuilder()
@@ -70,19 +90,30 @@ module.exports = (client) => {
             new ButtonBuilder()
               .setCustomId('news')
               .setLabel('📰 News')
-              .setStyle(ButtonStyle.Primary),
+              .setStyle(
+                ButtonStyle.Primary
+              ),
 
             new ButtonBuilder()
               .setCustomId('xenon')
               .setLabel('⚡ Xenon')
-              .setStyle(ButtonStyle.Primary),
+              .setStyle(
+                ButtonStyle.Primary
+              ),
 
             new ButtonBuilder()
               .setCustomId('stance')
               .setLabel('🚗 Stance')
-              .setStyle(ButtonStyle.Primary)
+              .setStyle(
+                ButtonStyle.Primary
+              )
 
           );
+
+
+      // =====================================
+      // REIHE 2
+      // =====================================
 
       const row2 =
         new ActionRowBuilder()
@@ -91,30 +122,46 @@ module.exports = (client) => {
             new ButtonBuilder()
               .setCustomId('urlaub')
               .setLabel('🌴 Urlaub')
-              .setStyle(ButtonStyle.Success),
+              .setStyle(
+                ButtonStyle.Success
+              ),
 
             new ButtonBuilder()
               .setCustomId('sanktion')
               .setLabel('🔨 Sanktion')
-              .setStyle(ButtonStyle.Danger),
+              .setStyle(
+                ButtonStyle.Danger
+              ),
 
             new ButtonBuilder()
               .setCustomId('suche')
               .setLabel('🔍 Suche')
-              .setStyle(ButtonStyle.Secondary)
+              .setStyle(
+                ButtonStyle.Secondary
+              )
 
           );
 
+
+      // =====================================
+      // PANEL SENDEN
+      // =====================================
+
       await channel.send({
-        embeds: [embed],
+
+        embeds: [
+          embed
+        ],
+
         components: [
           row1,
           row2
         ]
+
       });
 
       console.log(
-        '✅ TopGear Panel gesendet.'
+        '✅ TopGear Panel wurde gesendet.'
       );
 
     } catch (error) {
@@ -127,160 +174,5 @@ module.exports = (client) => {
     }
 
   });
-
-
-  // =====================================
-  // BUTTONS
-  // =====================================
-
-  client.on(
-    'interactionCreate',
-    async interaction => {
-
-      if (!interaction.isButton()) return;
-
-      console.log(
-        `🔘 Button: ${interaction.customId}`
-      );
-
-
-      // =================================
-      // NEWS
-      // =================================
-
-      if (
-        interaction.customId === 'news'
-      ) {
-
-        return interaction.reply({
-          content:
-            '📰 News-System wird geöffnet.',
-          ephemeral: true
-        });
-
-      }
-
-
-      // =================================
-      // XENON
-      // =================================
-
-      if (
-        interaction.customId === 'xenon'
-      ) {
-
-        const modal =
-          new ModalBuilder()
-            .setCustomId('xenon_modal')
-            .setTitle('⚡ Xenon');
-
-        const nameInput =
-          new TextInputBuilder()
-            .setCustomId('name')
-            .setLabel('Kunden Name')
-            .setStyle(
-              TextInputStyle.Short
-            )
-            .setRequired(true);
-
-        const plateInput =
-          new TextInputBuilder()
-            .setCustomId('plate')
-            .setLabel('Kennzeichen')
-            .setStyle(
-              TextInputStyle.Short
-            )
-            .setRequired(true);
-
-        modal.addComponents(
-
-          new ActionRowBuilder()
-            .addComponents(
-              nameInput
-            ),
-
-          new ActionRowBuilder()
-            .addComponents(
-              plateInput
-            )
-
-        );
-
-        return interaction.showModal(
-          modal
-        );
-
-      }
-
-
-      // =================================
-      // STANCE
-      // =================================
-
-      if (
-        interaction.customId === 'stance'
-      ) {
-
-        return interaction.reply({
-          content:
-            '🚗 Stance-System ist aktiv.',
-          ephemeral: true
-        });
-
-      }
-
-
-      // =================================
-      // URLAUB
-      // =================================
-
-      if (
-        interaction.customId === 'urlaub'
-      ) {
-
-        return interaction.reply({
-          content:
-            '🌴 Urlaubs-System wird geöffnet.',
-          ephemeral: true
-        });
-
-      }
-
-
-      // =================================
-      // SANKTION
-      // =================================
-
-      if (
-        interaction.customId === 'sanktion'
-      ) {
-
-        return interaction.reply({
-          content:
-            '🔨 Sanktions-System wird geöffnet.',
-          ephemeral: true
-        });
-
-      }
-
-
-      // =================================
-      // SUCHE
-      // =================================
-
-      if (
-        interaction.customId === 'suche'
-      ) {
-
-        return interaction.reply({
-          content:
-            '🔍 Suche-System wird geöffnet.',
-          ephemeral: true
-        });
-
-      }
-
-    }
-  );
 
 };
