@@ -127,7 +127,7 @@ module.exports = (client) => {
       return interaction.reply({
 
         content:
-          '📸 **Bild senden**\n\nBitte sende jetzt das Bild als normale Discord-Nachricht in diesen Channel.',
+          '📸 **Bild senden**.',
 
         ephemeral: true
 
