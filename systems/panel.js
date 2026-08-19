@@ -1,204 +1,162 @@
 const {
-  EmbedBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
+  EmbedBuilder
 } = require('discord.js');
 
 const {
-  PANEL_CHANNEL_ID,
+  STANCE_CHANNEL_ID,
   LOGO,
   BANNER
 } = require('../config/ids');
 
 module.exports = (client) => {
 
-  // =========================
-  // PANEL ERSTELLEN
-  // =========================
+  client.on('interactionCreate', async interaction => {
 
-  client.once('ready', async () => {
+    // =========================
+    // STANCE BUTTON
+    // =========================
 
-    try {
+    if (
+      interaction.isButton() &&
+      interaction.customId === 'stance'
+    ) {
+
+      const modal =
+        new ModalBuilder()
+          .setCustomId('stance_modal')
+          .setTitle('🚗 Stance');
+
+      const customerInput =
+        new TextInputBuilder()
+          .setCustomId('customer_name')
+          .setLabel('Kunden Name')
+          .setPlaceholder('Name des Kunden')
+          .setStyle(
+            TextInputStyle.Short
+          )
+          .setRequired(true)
+          .setMaxLength(100);
+
+      const plateInput =
+        new TextInputBuilder()
+          .setCustomId('plate')
+          .setLabel('Kennzeichen')
+          .setPlaceholder('z.B. M-AB 1234')
+          .setStyle(
+            TextInputStyle.Short
+          )
+          .setRequired(true)
+          .setMaxLength(20);
+
+      modal.addComponents(
+
+        new ActionRowBuilder()
+          .addComponents(
+            customerInput
+          ),
+
+        new ActionRowBuilder()
+          .addComponents(
+            plateInput
+          )
+
+      );
+
+      return interaction.showModal(modal);
+    }
+
+
+    // =========================
+    // STANCE MODAL
+    // =========================
+
+    if (
+      interaction.isModalSubmit() &&
+      interaction.customId === 'stance_modal'
+    ) {
+
+      const customer =
+        interaction.fields.getTextInputValue(
+          'customer_name'
+        );
+
+      const plate =
+        interaction.fields.getTextInputValue(
+          'plate'
+        );
 
       const channel =
-        client.channels.cache.get(
-          PANEL_CHANNEL_ID
+        interaction.guild.channels.cache.get(
+          STANCE_CHANNEL_ID
         );
 
       if (!channel) {
-        console.log(
-          '❌ Panel-Channel nicht gefunden.'
-        );
-        return;
-      }
 
-      const messages =
-        await channel.messages.fetch({
-          limit: 100
+        return interaction.reply({
+          content:
+            '❌ Der Stance-Channel wurde nicht gefunden.',
+          ephemeral: true
         });
 
-      const botMessages =
-        messages.filter(
-          msg =>
-            msg.author.id === client.user.id
-        );
-
-      for (const msg of botMessages.values()) {
-        await msg.delete().catch(() => {});
       }
+
+
+      // =========================
+      // EMBED
+      // =========================
 
       const embed =
         new EmbedBuilder()
 
           .setColor('#2B65FF')
 
-          .setTitle('⚙️ TOPGEAR PANEL')
+          .setTitle('🚗 Stance')
 
           .setDescription(
-            '🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)\n\n' +
-            'Wähle unten eine Aktion aus.'
+            `👤 **Kunden Name:** ${customer}\n\n` +
+            `📄 **Kennzeichen:** ${plate}`
           )
 
           .setThumbnail(LOGO)
 
           .setImage(BANNER)
 
-          .setTimestamp();
+          .setFooter({
+            text:
+              `Erstellt von ${interaction.user.username} ${new Date().toLocaleString('de-DE')} | Hostet by 𝔖𝔱𝔞𝔫𝔩𝔢𝔶_𝔯𝔪𝔭.06 ♕`,
+            iconURL:
+              interaction.user.displayAvatarURL({
+                extension: 'png',
+                size: 64
+              })
+          });
+
 
       // =========================
-      // REIHE 1
+      // IN STANCE-CHANNEL SENDEN
       // =========================
-
-      const row1 =
-        new ActionRowBuilder()
-          .addComponents(
-
-            new ButtonBuilder()
-              .setCustomId('news')
-              .setLabel('📰 News')
-              .setStyle(
-                ButtonStyle.Primary
-              ),
-
-            new ButtonBuilder()
-              .setCustomId('xenon')
-              .setLabel('⚡ Xenon')
-              .setStyle(
-                ButtonStyle.Primary
-              ),
-
-            new ButtonBuilder()
-              .setCustomId('stance')
-              .setLabel('🚗 Stance')
-              .setStyle(
-                ButtonStyle.Primary
-              ),
-
-            new ButtonBuilder()
-              .setCustomId('urlaub')
-              .setLabel('🌴 Urlaub')
-              .setStyle(
-                ButtonStyle.Success
-              ),
-
-            new ButtonBuilder()
-              .setCustomId('sanktion')
-              .setLabel('🔨 Sanktion')
-              .setStyle(
-                ButtonStyle.Danger
-              )
-
-          );
-
-      // =========================
-      // REIHE 2
-      // =========================
-
-      const row2 =
-        new ActionRowBuilder()
-          .addComponents(
-
-            new ButtonBuilder()
-              .setCustomId('suche')
-              .setLabel('🔍 Suche')
-              .setStyle(
-                ButtonStyle.Secondary
-              )
-
-          );
 
       await channel.send({
-        embeds: [embed],
-        components: [
-          row1,
-          row2
-        ]
+        embeds: [embed]
       });
 
-      console.log(
-        '✅ TopGear Panel wurde erstellt.'
-      );
 
-    } catch (error) {
+      // =========================
+      // BESTÄTIGUNG
+      // =========================
 
-      console.error(
-        '❌ Fehler beim Panel:',
-        error
-      );
+      return interaction.reply({
+        content:
+          '✅ Stance wurde erfolgreich erstellt.',
+        ephemeral: true
+      });
 
     }
 
   });
-
-
-  // =========================
-  // BUTTON TEST HANDLER
-  // =========================
-
-  client.on(
-    'interactionCreate',
-    async interaction => {
-
-      if (!interaction.isButton()) {
-        return;
-      }
-
-      const buttons = [
-        'news',
-        'xenon',
-        'stance',
-        'urlaub',
-        'sanktion',
-        'suche'
-      ];
-
-      if (
-        !buttons.includes(
-          interaction.customId
-        )
-      ) {
-        return;
-      }
-
-      try {
-
-        return interaction.reply({
-          content:
-            `✅ **${interaction.customId}** wurde gedrückt.`,
-          ephemeral: true
-        });
-
-      } catch (error) {
-
-        console.error(
-          '❌ Button-Fehler:',
-          error
-        );
-
-      }
-
-    }
-  );
 
 };
