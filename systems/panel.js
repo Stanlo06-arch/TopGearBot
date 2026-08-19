@@ -13,6 +13,10 @@ const {
 
 module.exports = (client) => {
 
+  // =========================
+  // PANEL ERSTELLEN
+  // =========================
+
   client.once('ready', async () => {
 
     try {
@@ -23,11 +27,12 @@ module.exports = (client) => {
         );
 
       if (!channel) {
-        console.log('❌ Panel-Channel nicht gefunden.');
+        console.log(
+          '❌ Panel-Channel nicht gefunden.'
+        );
         return;
       }
 
-      // Alte Bot-Nachrichten löschen
       const messages =
         await channel.messages.fetch({
           limit: 100
@@ -43,7 +48,6 @@ module.exports = (client) => {
         await msg.delete().catch(() => {});
       }
 
-      // PANEL EMBED
       const embed =
         new EmbedBuilder()
 
@@ -62,7 +66,10 @@ module.exports = (client) => {
 
           .setTimestamp();
 
+      // =========================
       // REIHE 1
+      // =========================
+
       const row1 =
         new ActionRowBuilder()
           .addComponents(
@@ -104,7 +111,10 @@ module.exports = (client) => {
 
           );
 
+      // =========================
       // REIHE 2
+      // =========================
+
       const row2 =
         new ActionRowBuilder()
           .addComponents(
@@ -118,7 +128,6 @@ module.exports = (client) => {
 
           );
 
-      // PANEL SENDEN
       await channel.send({
         embeds: [embed],
         components: [
@@ -134,12 +143,62 @@ module.exports = (client) => {
     } catch (error) {
 
       console.error(
-        '❌ Fehler beim Erstellen des Panels:',
+        '❌ Fehler beim Panel:',
         error
       );
 
     }
 
   });
+
+
+  // =========================
+  // BUTTON TEST HANDLER
+  // =========================
+
+  client.on(
+    'interactionCreate',
+    async interaction => {
+
+      if (!interaction.isButton()) {
+        return;
+      }
+
+      const buttons = [
+        'news',
+        'xenon',
+        'stance',
+        'urlaub',
+        'sanktion',
+        'suche'
+      ];
+
+      if (
+        !buttons.includes(
+          interaction.customId
+        )
+      ) {
+        return;
+      }
+
+      try {
+
+        return interaction.reply({
+          content:
+            `✅ **${interaction.customId}** wurde gedrückt.`,
+          ephemeral: true
+        });
+
+      } catch (error) {
+
+        console.error(
+          '❌ Button-Fehler:',
+          error
+        );
+
+      }
+
+    }
+  );
 
 };
