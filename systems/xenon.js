@@ -156,7 +156,7 @@ module.exports = (client) => {
       await interaction.reply({
 
         content:
-          '📸 **Bild senden**\n\nBitte sende jetzt das Xenon-Bild als normale Discord-Nachricht.',
+          '📸 **Bild senden**',
 
         ephemeral: false
 
