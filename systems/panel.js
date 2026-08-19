@@ -21,7 +21,9 @@ module.exports = (client) => {
 
     try {
 
-      console.log('🔄 TopGear Panel wird aktualisiert...');
+      console.log(
+        '🔄 TopGear Panel wird aktualisiert...'
+      );
 
       const channel =
         await client.channels.fetch(
@@ -36,6 +38,7 @@ module.exports = (client) => {
 
         return;
       }
+
 
       // =====================================
       // ALTE BOT-NACHRICHTEN LÖSCHEN
@@ -60,6 +63,7 @@ module.exports = (client) => {
         }
 
       }
+
 
       // =====================================
       // PANEL EMBED
@@ -86,6 +90,7 @@ module.exports = (client) => {
           .setImage(
             BANNER
           );
+
 
       // =====================================
       // REIHE 1
@@ -118,6 +123,7 @@ module.exports = (client) => {
 
           );
 
+
       // =====================================
       // REIHE 2
       // =====================================
@@ -149,6 +155,7 @@ module.exports = (client) => {
 
           );
 
+
       // =====================================
       // PANEL SENDEN
       // =====================================
@@ -170,6 +177,7 @@ module.exports = (client) => {
         '✅ TopGear Panel wurde gesendet.'
       );
 
+
     } catch (error) {
 
       console.error(
@@ -183,8 +191,8 @@ module.exports = (client) => {
 
 
   // =====================================
-  // NACHRICHTEN IM PANEL NACH 5 SEKUNDEN
-  // LÖSCHEN
+  // NACHRICHTEN IM PANEL
+  // NACH 10 SEKUNDEN LÖSCHEN
   // =====================================
 
   client.on(
@@ -199,14 +207,16 @@ module.exports = (client) => {
         return;
       }
 
-      // Nachrichten vom Bot behalten
+
+      // Bot-Nachrichten NICHT löschen
       if (
         message.author.bot
       ) {
         return;
       }
 
-      // 5 Sekunden warten
+
+      // 10 Sekunden warten
       setTimeout(
         async () => {
 
