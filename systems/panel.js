@@ -20,8 +20,12 @@ module.exports = (client) => {
         PANEL_CHANNEL_ID
       );
 
-    if (!channel) return;
+    if (!channel) {
+      console.log('❌ Panel-Channel nicht gefunden.');
+      return;
+    }
 
+    // Alte Bot-Nachrichten löschen
     const messages =
       await channel.messages.fetch();
 
@@ -36,17 +40,17 @@ module.exports = (client) => {
       await msg.delete().catch(() => {});
     }
 
+    // PANEL EMBED
     const embed = new EmbedBuilder()
 
       .setColor('#2B65FF')
 
       .setTitle('⚙️ TOPGEAR PANEL')
 
-     .setDescription(`
-🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)
-
-Wähle unten eine Aktion aus.
-`)
+      .setDescription(
+        '🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)\n\n' +
+        'Wähle unten eine Aktion aus.'
+      )
 
       .setThumbnail(LOGO)
 
@@ -54,50 +58,72 @@ Wähle unten eine Aktion aus.
 
       .setTimestamp();
 
-    const row1 = new ActionRowBuilder()
-.addComponents(
+    // ERSTE REIHE
+    const row1 =
+      new ActionRowBuilder()
+        .addComponents(
 
-  new ButtonBuilder()
-    .setCustomId('news')
-    .setLabel('📰 News')
-    .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId('news')
+            .setLabel('📰 News')
+            .setStyle(
+              ButtonStyle.Primary
+            ),
 
-  new ButtonBuilder()
-    .setCustomId('xenon')
-    .setLabel('⚡ Xenon')
-    .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId('xenon')
+            .setLabel('⚡ Xenon')
+            .setStyle(
+              ButtonStyle.Primary
+            ),
 
-  new ButtonBuilder()
-    .setCustomId('stance')
-    .setLabel('🚗 Stance')
-    .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId('stance')
+            .setLabel('🚗 Stance')
+            .setStyle(
+              ButtonStyle.Primary
+            ),
 
-  new ButtonBuilder()
-    .setCustomId('urlaub')
-    .setLabel('🌴 Urlaub')
-    .setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId('urlaub')
+            .setLabel('🌴 Urlaub')
+            .setStyle(
+              ButtonStyle.Success
+            ),
 
-);
+          new ButtonBuilder()
+            .setCustomId('sanktion')
+            .setLabel('🔨 Sanktion')
+            .setStyle(
+              ButtonStyle.Danger
+            )
 
-const row2 = new ActionRowBuilder()
-.addComponents(
+        );
 
-  new ButtonBuilder()
-    .setCustomId('sanktion')
-    .setLabel('🔨 Sanktion')
-    .setStyle(ButtonStyle.Danger)
+    // ZWEITE REIHE
+    const row2 =
+      new ActionRowBuilder()
+        .addComponents(
 
-  new ButtonBuilder()
-    .setCustomId('suche')
-    .setLabel('🔍 Suche')
-    .setStyle(ButtonStyle.Secondary)
+          new ButtonBuilder()
+            .setCustomId('suche')
+            .setLabel('🔍 Suche')
+            .setStyle(
+              ButtonStyle.Secondary
+            )
 
-);
+        );
 
+    // PANEL SENDEN
     await channel.send({
       embeds: [embed],
-      components: [row1, row2]
+      components: [
+        row1,
+        row2
+      ]
     });
+
+    console.log('✅ TopGear Panel wurde erstellt.');
 
   });
 
