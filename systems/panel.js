@@ -36,26 +36,22 @@ module.exports = (client) => {
       }
 
       // Alte Bot-Nachrichten löschen
-      const messages =
-        await channel.messages.fetch({
-          limit: 100
-        });
+     const messages =
+  await channel.messages.fetch({
+    limit: 100
+  });
 
-      for (const message of messages.values()) {
+for (const message of messages.values()) {
 
-        if (
-          message.author.id ===
-          client.user.id
-        ) {
+  await message
+    .delete()
+    .catch(error => {
+      console.log(
+        `❌ Nachricht konnte nicht gelöscht werden: ${error.message}`
+      );
+    });
 
-          await message
-            .delete()
-            .catch(() => {});
-
-        }
-
-      }
-
+}
       // =====================================
       // EMBED
       // =====================================
