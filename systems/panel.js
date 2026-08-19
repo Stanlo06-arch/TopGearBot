@@ -21,6 +21,8 @@ module.exports = (client) => {
 
     try {
 
+      console.log('🔄 TopGear Panel wird aktualisiert...');
+
       const channel =
         await client.channels.fetch(
           PANEL_CHANNEL_ID
@@ -35,25 +37,32 @@ module.exports = (client) => {
         return;
       }
 
-      // Alte Bot-Nachrichten löschen
-     const messages =
-  await channel.messages.fetch({
-    limit: 100
-  });
-
-for (const message of messages.values()) {
-
-  await message
-    .delete()
-    .catch(error => {
-      console.log(
-        `❌ Nachricht konnte nicht gelöscht werden: ${error.message}`
-      );
-    });
-
-}
       // =====================================
-      // EMBED
+      // ALTE BOT-NACHRICHTEN LÖSCHEN
+      // =====================================
+
+      const messages =
+        await channel.messages.fetch({
+          limit: 100
+        });
+
+      for (const message of messages.values()) {
+
+        if (
+          message.author.id ===
+          client.user.id
+        ) {
+
+          await message
+            .delete()
+            .catch(() => {});
+
+        }
+
+      }
+
+      // =====================================
+      // PANEL EMBED
       // =====================================
 
       const embed =
@@ -70,10 +79,13 @@ for (const message of messages.values()) {
             'Wähle unten eine Aktion aus.'
           )
 
-          .setThumbnail(LOGO)
+          .setThumbnail(
+            LOGO
+          )
 
-          .setImage(BANNER);
-
+          .setImage(
+            BANNER
+          );
 
       // =====================================
       // REIHE 1
@@ -106,7 +118,6 @@ for (const message of messages.values()) {
 
           );
 
-
       // =====================================
       // REIHE 2
       // =====================================
@@ -137,7 +148,6 @@ for (const message of messages.values()) {
               )
 
           );
-
 
       // =====================================
       // PANEL SENDEN
@@ -170,5 +180,45 @@ for (const message of messages.values()) {
     }
 
   });
+
+
+  // =====================================
+  // NACHRICHTEN IM PANEL NACH 5 SEKUNDEN
+  // LÖSCHEN
+  // =====================================
+
+  client.on(
+    'messageCreate',
+    async message => {
+
+      // Nur Panel-Channel
+      if (
+        message.channel.id !==
+        PANEL_CHANNEL_ID
+      ) {
+        return;
+      }
+
+      // Nachrichten vom Bot behalten
+      if (
+        message.author.bot
+      ) {
+        return;
+      }
+
+      // 5 Sekunden warten
+      setTimeout(
+        async () => {
+
+          await message
+            .delete()
+            .catch(() => {});
+
+        },
+        5000
+      );
+
+    }
+  );
 
 };
