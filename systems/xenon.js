@@ -114,7 +114,7 @@ module.exports = (client) => {
       return interaction.reply({
 
         content:
-          '📸 **Bild senden**\n\nBitte sende jetzt das Xenon-Bild.',
+          '📸 **Bild senden**.',
 
         ephemeral: true
 
