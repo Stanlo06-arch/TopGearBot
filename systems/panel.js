@@ -1,153 +1,162 @@
 const {
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  ActionRowBuilder
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
 } = require('discord.js');
+
+const {
+  PANEL_CHANNEL_ID,
+  LOGO,
+  BANNER
+} = require('../config/ids');
 
 module.exports = (client) => {
 
-  client.on('interactionCreate', async interaction => {
+  client.once('ready', async () => {
 
-    if (!interaction.isButton()) return;
+    try {
 
-    console.log(
-      `🔘 Button gedrückt: ${interaction.customId}`
-    );
+      console.log('🔄 TopGear Panel wird aktualisiert...');
 
-    // =========================
-    // XENON
-    // =========================
+      const channel =
+        await client.channels.fetch(
+          PANEL_CHANNEL_ID
+        ).catch(() => null);
 
-    if (interaction.customId === 'xenon') {
+      if (!channel) {
+        console.log(
+          '❌ Panel-Channel nicht gefunden.'
+        );
+        return;
+      }
 
-      const modal = new ModalBuilder()
-        .setCustomId('xenon_modal')
-        .setTitle('⚡ Xenon');
+      // =====================================
+      // ALTE BOT-PANEL LÖSCHEN
+      // =====================================
 
-      const nameInput = new TextInputBuilder()
-        .setCustomId('name')
-        .setLabel('Kunden Name')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
+      const messages =
+        await channel.messages.fetch({
+          limit: 100
+        });
 
-      const plateInput = new TextInputBuilder()
-        .setCustomId('plate')
-        .setLabel('Kennzeichen')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
+      for (const message of messages.values()) {
 
-      modal.addComponents(
+        if (
+          message.author.id ===
+          client.user.id
+        ) {
+          await message.delete().catch(() => {});
+        }
 
+      }
+
+      // =====================================
+      // PANEL EMBED
+      // =====================================
+
+      const embed =
+        new EmbedBuilder()
+
+          .setColor('#2B65FF')
+
+          .setTitle('⚙️ TOPGEAR PANEL')
+
+          .setDescription(
+            '🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)\n\n' +
+            'Wähle unten eine Aktion aus.'
+          )
+
+          .setThumbnail(LOGO)
+
+          .setImage(BANNER);
+
+      // =====================================
+      // REIHE 1
+      // =====================================
+
+      const row1 =
         new ActionRowBuilder()
-          .addComponents(nameInput),
+          .addComponents(
 
+            new ButtonBuilder()
+              .setCustomId('news')
+              .setLabel('📰 News')
+              .setStyle(
+                ButtonStyle.Primary
+              ),
+
+            new ButtonBuilder()
+              .setCustomId('xenon')
+              .setLabel('⚡ Xenon')
+              .setStyle(
+                ButtonStyle.Primary
+              ),
+
+            new ButtonBuilder()
+              .setCustomId('stance')
+              .setLabel('🚗 Stance')
+              .setStyle(
+                ButtonStyle.Primary
+              )
+
+          );
+
+      // =====================================
+      // REIHE 2
+      // =====================================
+
+      const row2 =
         new ActionRowBuilder()
-          .addComponents(plateInput)
+          .addComponents(
 
+            new ButtonBuilder()
+              .setCustomId('urlaub')
+              .setLabel('🌴 Urlaub')
+              .setStyle(
+                ButtonStyle.Success
+              ),
+
+            new ButtonBuilder()
+              .setCustomId('sanktion')
+              .setLabel('🔨 Sanktion')
+              .setStyle(
+                ButtonStyle.Danger
+              ),
+
+            new ButtonBuilder()
+              .setCustomId('suche')
+              .setLabel('🔍 Suche')
+              .setStyle(
+                ButtonStyle.Secondary
+              )
+
+          );
+
+      // =====================================
+      // NEUES PANEL SENDEN
+      // =====================================
+
+      const panelMessage =
+        await channel.send({
+          embeds: [embed],
+          components: [
+            row1,
+            row2
+          ]
+        });
+
+      console.log(
+        `✅ Neues Panel gesendet: ${panelMessage.id}`
       );
 
-      return interaction.showModal(modal);
-    }
+    } catch (error) {
 
-
-    // =========================
-    // URLAUB
-    // =========================
-
-    if (interaction.customId === 'urlaub') {
-
-      const modal = new ModalBuilder()
-        .setCustomId('urlaub_modal')
-        .setTitle('🌴 Urlaub');
-
-      const nameInput = new TextInputBuilder()
-        .setCustomId('name')
-        .setLabel('Name')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
-
-      const reasonInput = new TextInputBuilder()
-        .setCustomId('reason')
-        .setLabel('Zeitraum / Grund')
-        .setStyle(TextInputStyle.Paragraph)
-        .setRequired(true);
-
-      modal.addComponents(
-
-        new ActionRowBuilder()
-          .addComponents(nameInput),
-
-        new ActionRowBuilder()
-          .addComponents(reasonInput)
-
+      console.error(
+        '❌ Panel konnte nicht erstellt werden:',
+        error
       );
 
-      return interaction.showModal(modal);
-    }
-
-
-    // =========================
-    // SANKTION
-    // =========================
-
-    if (interaction.customId === 'sanktion') {
-
-      const modal = new ModalBuilder()
-        .setCustomId('sanktion_modal')
-        .setTitle('🔨 Sanktion');
-
-      const nameInput = new TextInputBuilder()
-        .setCustomId('name')
-        .setLabel('Name')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
-
-      const reasonInput = new TextInputBuilder()
-        .setCustomId('reason')
-        .setLabel('Grund')
-        .setStyle(TextInputStyle.Paragraph)
-        .setRequired(true);
-
-      modal.addComponents(
-
-        new ActionRowBuilder()
-          .addComponents(nameInput),
-
-        new ActionRowBuilder()
-          .addComponents(reasonInput)
-
-      );
-
-      return interaction.showModal(modal);
-    }
-
-
-    // =========================
-    // SUCHE
-    // =========================
-
-    if (interaction.customId === 'suche') {
-
-      const modal = new ModalBuilder()
-        .setCustomId('suche_modal')
-        .setTitle('🔍 Suche');
-
-      const searchInput = new TextInputBuilder()
-        .setCustomId('search')
-        .setLabel('Suchbegriff')
-        .setPlaceholder('Wonach möchtest du suchen?')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
-
-      modal.addComponents(
-
-        new ActionRowBuilder()
-          .addComponents(searchInput)
-
-      );
-
-      return interaction.showModal(modal);
     }
 
   });
