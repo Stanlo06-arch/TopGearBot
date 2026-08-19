@@ -16,53 +16,46 @@ module.exports = (client) => {
 
   client.on('interactionCreate', async interaction => {
 
-    // =========================
+    // ==========================================
     // STANCE BUTTON
-    // =========================
+    // ==========================================
 
     if (
       interaction.isButton() &&
       interaction.customId === 'stance'
     ) {
 
-      const modal =
-        new ModalBuilder()
-          .setCustomId('stance_modal')
-          .setTitle('🚗 Stance');
+      const modal = new ModalBuilder()
+        .setCustomId('stance_modal')
+        .setTitle('🏁 Stance');
 
-      const customerInput =
+      // KUNDEN NAME
+      const nameInput =
         new TextInputBuilder()
           .setCustomId('customer_name')
-          .setLabel('Kunden Name')
+          .setLabel('Name')
           .setPlaceholder('Name des Kunden')
-          .setStyle(
-            TextInputStyle.Short
-          )
+          .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(100);
 
+      // KENNZEICHEN
       const plateInput =
         new TextInputBuilder()
           .setCustomId('plate')
           .setLabel('Kennzeichen')
-          .setPlaceholder('z.B. M-AB 1234')
-          .setStyle(
-            TextInputStyle.Short
-          )
+          .setPlaceholder('z.B. QVC 922')
+          .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(20);
 
       modal.addComponents(
 
         new ActionRowBuilder()
-          .addComponents(
-            customerInput
-          ),
+          .addComponents(nameInput),
 
         new ActionRowBuilder()
-          .addComponents(
-            plateInput
-          )
+          .addComponents(plateInput)
 
       );
 
@@ -70,90 +63,126 @@ module.exports = (client) => {
     }
 
 
-    // =========================
-    // STANCE MODAL
-    // =========================
+    // ==========================================
+    // MODAL ABSENDEN
+    // ==========================================
 
     if (
       interaction.isModalSubmit() &&
       interaction.customId === 'stance_modal'
     ) {
 
-      const customer =
-        interaction.fields.getTextInputValue(
-          'customer_name'
-        );
+      try {
 
-      const plate =
-        interaction.fields.getTextInputValue(
-          'plate'
-        );
+        const customerName =
+          interaction.fields.getTextInputValue(
+            'customer_name'
+          );
 
-      const channel =
-        interaction.guild.channels.cache.get(
-          STANCE_CHANNEL_ID
-        );
+        const plate =
+          interaction.fields.getTextInputValue(
+            'plate'
+          );
 
-      if (!channel) {
+        // STANCE CHANNEL
+        const channel =
+          interaction.guild.channels.cache.get(
+            STANCE_CHANNEL_ID
+          );
+
+        if (!channel) {
+
+          return interaction.reply({
+            content:
+              '❌ Der Stance-Channel wurde nicht gefunden.',
+            ephemeral: true
+          });
+
+        }
+
+
+        // ==========================================
+        // STANCE EMBED
+        // ==========================================
+
+        const embed =
+          new EmbedBuilder()
+
+            // GRÜNE FARBE
+            .setColor('#7CFF00')
+
+            // OBEN LINKS
+            .setAuthor({
+              name: 'Top Gear Performance'
+            })
+
+            // TITEL
+            .setTitle('🏁 Stance')
+
+            // NAME + KENNZEICHEN
+            .setDescription(
+              `👤 **Name**\n` +
+              `${customerName}\n\n` +
+
+              `🔢 **Kennzeichen**\n` +
+              `${plate}`
+            )
+
+            // LOGO OBEN RECHTS
+            .setThumbnail(LOGO)
+
+            // BILD UNTEN
+            .setImage(BANNER)
+
+            // FOOTER
+            .setFooter({
+              text:
+                `Erstellt von @${interaction.user.username} | Hostet by 𝓘𝓽𝓼  𝓢𝓽𝓪𝓷𝔃𝔂 ♕`,
+              iconURL:
+                interaction.user.displayAvatarURL({
+                  extension: 'png',
+                  size: 64
+                })
+            });
+
+
+        // ==========================================
+        // IN STANCE CHANNEL SENDEN
+        // ==========================================
+
+        await channel.send({
+          embeds: [embed]
+        });
+
+
+        // ==========================================
+        // BESTÄTIGUNG
+        // ==========================================
 
         return interaction.reply({
           content:
-            '❌ Der Stance-Channel wurde nicht gefunden.',
+            '✅ Stance wurde erfolgreich erstellt.',
           ephemeral: true
         });
 
-      }
+      } catch (error) {
 
+        console.error(
+          '❌ Fehler beim Erstellen der Stance:',
+          error
+        );
 
-      // =========================
-      // EMBED
-      // =========================
+        if (!interaction.replied) {
 
-      const embed =
-        new EmbedBuilder()
-
-          .setColor('#2B65FF')
-
-          .setTitle('🚗 Stance')
-
-          .setDescription(
-            `👤 **Kunden Name:** ${customer}\n\n` +
-            `📄 **Kennzeichen:** ${plate}`
-          )
-
-          .setThumbnail(LOGO)
-
-          .setImage(BANNER)
-
-          .setFooter({
-            text:
-              `Erstellt von ${interaction.user.username} ${new Date().toLocaleString('de-DE')} | Hostet by 𝔖𝔱𝔞𝔫𝔩𝔢𝔶_𝔯𝔪𝔭.06 ♕`,
-            iconURL:
-              interaction.user.displayAvatarURL({
-                extension: 'png',
-                size: 64
-              })
+          return interaction.reply({
+            content:
+              '❌ Beim Erstellen der Stance ist ein Fehler aufgetreten.',
+            ephemeral: true
           });
 
+        }
 
-      // =========================
-      // IN STANCE-CHANNEL SENDEN
-      // =========================
-
-      await channel.send({
-        embeds: [embed]
-      });
-
-
-      // =========================
-      // BESTÄTIGUNG
-      // =========================
-
-      return interaction.reply({
-        content:
-          '✅ Stance wurde erfolgreich erstellt.',
-        ephemeral: true
-      });
+      }
 
     }
 
