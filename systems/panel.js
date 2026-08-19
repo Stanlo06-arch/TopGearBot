@@ -11,6 +11,10 @@ module.exports = (client) => {
 
     if (!interaction.isButton()) return;
 
+    console.log(
+      `🔘 Button gedrückt: ${interaction.customId}`
+    );
+
     // =========================
     // XENON
     // =========================
@@ -21,21 +25,26 @@ module.exports = (client) => {
         .setCustomId('xenon_modal')
         .setTitle('⚡ Xenon');
 
-      const name = new TextInputBuilder()
-        .setCustomId('customer_name')
+      const nameInput = new TextInputBuilder()
+        .setCustomId('name')
         .setLabel('Kunden Name')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
-      const plate = new TextInputBuilder()
+      const plateInput = new TextInputBuilder()
         .setCustomId('plate')
         .setLabel('Kennzeichen')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
       modal.addComponents(
-        new ActionRowBuilder().addComponents(name),
-        new ActionRowBuilder().addComponents(plate)
+
+        new ActionRowBuilder()
+          .addComponents(nameInput),
+
+        new ActionRowBuilder()
+          .addComponents(plateInput)
+
       );
 
       return interaction.showModal(modal);
@@ -52,21 +61,26 @@ module.exports = (client) => {
         .setCustomId('urlaub_modal')
         .setTitle('🌴 Urlaub');
 
-      const name = new TextInputBuilder()
+      const nameInput = new TextInputBuilder()
         .setCustomId('name')
         .setLabel('Name')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
-      const reason = new TextInputBuilder()
+      const reasonInput = new TextInputBuilder()
         .setCustomId('reason')
-        .setLabel('Grund / Zeitraum')
+        .setLabel('Zeitraum / Grund')
         .setStyle(TextInputStyle.Paragraph)
         .setRequired(true);
 
       modal.addComponents(
-        new ActionRowBuilder().addComponents(name),
-        new ActionRowBuilder().addComponents(reason)
+
+        new ActionRowBuilder()
+          .addComponents(nameInput),
+
+        new ActionRowBuilder()
+          .addComponents(reasonInput)
+
       );
 
       return interaction.showModal(modal);
@@ -83,21 +97,26 @@ module.exports = (client) => {
         .setCustomId('sanktion_modal')
         .setTitle('🔨 Sanktion');
 
-      const name = new TextInputBuilder()
+      const nameInput = new TextInputBuilder()
         .setCustomId('name')
         .setLabel('Name')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
-      const reason = new TextInputBuilder()
+      const reasonInput = new TextInputBuilder()
         .setCustomId('reason')
         .setLabel('Grund')
         .setStyle(TextInputStyle.Paragraph)
         .setRequired(true);
 
       modal.addComponents(
-        new ActionRowBuilder().addComponents(name),
-        new ActionRowBuilder().addComponents(reason)
+
+        new ActionRowBuilder()
+          .addComponents(nameInput),
+
+        new ActionRowBuilder()
+          .addComponents(reasonInput)
+
       );
 
       return interaction.showModal(modal);
@@ -114,14 +133,18 @@ module.exports = (client) => {
         .setCustomId('suche_modal')
         .setTitle('🔍 Suche');
 
-      const search = new TextInputBuilder()
+      const searchInput = new TextInputBuilder()
         .setCustomId('search')
-        .setLabel('Wonach möchtest du suchen?')
+        .setLabel('Suchbegriff')
+        .setPlaceholder('Wonach möchtest du suchen?')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
       modal.addComponents(
-        new ActionRowBuilder().addComponents(search)
+
+        new ActionRowBuilder()
+          .addComponents(searchInput)
+
       );
 
       return interaction.showModal(modal);
