@@ -215,7 +215,7 @@ module.exports = (client) => {
             .catch(() => {});
 
         },
-        5000
+        10000
       );
 
     }
