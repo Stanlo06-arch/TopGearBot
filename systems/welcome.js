@@ -56,7 +56,7 @@ module.exports = (client) => {
         // Kleiner Text unten
         .setFooter({
           text:
-            `Erstellt von @${member.user.username} | Hostet by 𝓘𝓽𝓼  𝓢𝓽𝓪𝓷𝔃𝔂 ♕`
+            `Erstellt von @${member.user.username} | Hostet by 𝐈𝐭𝐬𝐅𝐥𝐮♕`
         })
 
         .setTimestamp();
