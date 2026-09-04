@@ -192,7 +192,7 @@ module.exports = (client) => {
           .setFooter({
 
             text:
-              `Erstellt von @${interaction.user.username} ${date} | Hostet by 𝓘𝓽𝓼  𝓢𝓽𝓪𝓷𝔃𝔂 ♕`,
+              `Erstellt von @${interaction.user.username} ${date} | Hostet by 𝐈𝐭𝐬𝐅𝐥𝐮♕`,
 
             iconURL:
               interaction.user.displayAvatarURL({
