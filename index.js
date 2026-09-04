@@ -20,10 +20,12 @@ const client = new Client({
 });
 
 require('./systems/panel')(client);
+require('./systems/news')(client);
 require('./systems/stance')(client);
 require('./systems/xenon')(client);
 require('./systems/urlaub')(client);
 require('./systems/sanktion')(client);
+require('./systems/welcome')(client);
 
 client.once('ready', () => {
 
