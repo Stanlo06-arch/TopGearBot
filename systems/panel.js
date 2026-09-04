@@ -72,7 +72,7 @@ module.exports = (client) => {
       const embed =
         new EmbedBuilder()
 
-         .setColor('#7CFF00')
+          .setColor('#7CFF00')
 
           .setTitle(
             '⚙️ TOPGEAR PANEL'
@@ -89,7 +89,18 @@ module.exports = (client) => {
 
           .setImage(
             BANNER
-          );
+          )
+
+          // =====================================
+          // FOOTER
+          // =====================================
+
+          .setFooter({
+            text:
+              'Hostet by 𝐈𝐭𝐬𝐅𝐥𝐮♕',
+            iconURL:
+              LOGO
+          });
 
 
       // =====================================
