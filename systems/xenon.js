@@ -323,7 +323,7 @@ module.exports = (client) => {
           .setFooter({
 
             text:
-              `Erstellt von @${message.author.username} ${date} | Hostet by 𝓘𝓽𝓼  𝓢𝓽𝓪𝓷𝔃𝔂 ♕`,
+              `Erstellt von @${message.author.username} ${date} | Hostet by 𝐈𝐭𝐬𝐅𝐥𝐮♕`,
 
             iconURL:
               message.author.displayAvatarURL({
