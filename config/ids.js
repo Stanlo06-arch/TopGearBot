@@ -12,6 +12,8 @@ module.exports = {
 
   SANKTION_CHANNEL_ID: "1457161680776597746",
 
+  WELCOME_CHANNEL_ID: "1457160970811080910",
+
   LOGO:
     "https://cdn.discordapp.com/attachments/1475610426766262333/1495199546035146822/Top_Gear.png",
 
