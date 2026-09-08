@@ -79,9 +79,10 @@ module.exports = (client) => {
           )
 
           .setDescription(
-          '🎨 [Farbkatalog](https://farben-katalog.base44.app/)\n\n' +
-            'Wähle unten eine Aktion aus.'
-           )
+  `🎨 [Farbkatalog](https://farben-katalog.base44.app/)
+
+Wähle unten eine Aktion aus.`
+)
 
           .setThumbnail(
             LOGO
