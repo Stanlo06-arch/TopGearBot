@@ -79,9 +79,9 @@ module.exports = (client) => {
           )
 
           .setDescription(
-            '🎨 [Farbkatalog](https://cctuner.sequell.de/index.php)\n\n' +
+          '🎨 [Farbkatalog](https://farben-katalog.base44.app/)\n\n' +
             'Wähle unten eine Aktion aus.'
-          )
+           )
 
           .setThumbnail(
             LOGO
