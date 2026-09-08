@@ -8,8 +8,7 @@ const {
 
 const {
   XENON_CHANNEL_ID,
-  LOGO,
-  BANNER
+  LOGO
 } = require('../config/ids');
 
 const xenonData = new Map();
@@ -47,45 +46,34 @@ module.exports = (client) => {
         return;
       }
 
-
       const modal =
         new ModalBuilder()
-          .setCustomId(
-            'xenon_modal'
-          )
-          .setTitle(
-            '⚡ Xenon'
-          );
+          .setCustomId('xenon_modal')
+          .setTitle('⚡ Xenon');
 
 
+      // =====================================
       // KUNDEN NAME
+      // =====================================
+
       const nameInput =
         new TextInputBuilder()
-          .setCustomId(
-            'customer_name'
-          )
-          .setLabel(
-            'Kunden Name'
-          )
-          .setStyle(
-            TextInputStyle.Short
-          )
+          .setCustomId('customer_name')
+          .setLabel('Kunden Name')
+          .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(100);
 
 
+      // =====================================
       // KENNZEICHEN
+      // =====================================
+
       const plateInput =
         new TextInputBuilder()
-          .setCustomId(
-            'plate'
-          )
-          .setLabel(
-            'Kennzeichen'
-          )
-          .setStyle(
-            TextInputStyle.Short
-          )
+          .setCustomId('plate')
+          .setLabel('Kennzeichen')
+          .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(20);
 
@@ -105,9 +93,7 @@ module.exports = (client) => {
       );
 
 
-      return interaction.showModal(
-        modal
-      );
+      return interaction.showModal(modal);
 
     }
   );
@@ -123,8 +109,7 @@ module.exports = (client) => {
 
       if (
         !interaction.isModalSubmit() ||
-        interaction.customId !==
-        'xenon_modal'
+        interaction.customId !== 'xenon_modal'
       ) {
         return;
       }
@@ -150,28 +135,26 @@ module.exports = (client) => {
       );
 
 
-      // NORMALE NACHRICHT
-      // NICHT EPHEMERAL
+      // =====================================
+      // BILD SENDEN
+      // =====================================
 
       await interaction.reply({
 
         content:
-          '📸 **Bild senden**',
+          '📸 **Bild senden**\n\n' +
+          'Bitte sende jetzt das Bild als normale Discord-Nachricht.',
 
         ephemeral: false
 
       });
 
 
-      // Antwort holen
       const reply =
         await interaction.fetchReply();
 
 
-      // Nach 10 Sekunden löschen
-      deleteAfter10Seconds(
-        reply
-      );
+      deleteAfter10Seconds(reply);
 
     }
   );
@@ -185,9 +168,7 @@ module.exports = (client) => {
     'messageCreate',
     async message => {
 
-      if (
-        message.author.bot
-      ) {
+      if (message.author.bot) {
         return;
       }
 
@@ -203,7 +184,10 @@ module.exports = (client) => {
       }
 
 
-      // Keine Datei
+      // =====================================
+      // KEIN BILD
+      // =====================================
+
       if (
         message.attachments.size === 0
       ) {
@@ -215,12 +199,13 @@ module.exports = (client) => {
         message.attachments.first();
 
 
-      // Nur Bilder
+      // =====================================
+      // NUR BILDER ERLAUBEN
+      // =====================================
+
       if (
         !attachment.contentType ||
-        !attachment.contentType.startsWith(
-          'image/'
-        )
+        !attachment.contentType.startsWith('image/')
       ) {
 
         const errorMessage =
@@ -276,30 +261,28 @@ module.exports = (client) => {
 
 
       // =====================================
+      // DATEINAME FÜR DAS BILD
+      // =====================================
+
+      const fileName =
+        `xenon-${message.id}.png`;
+
+
+      // =====================================
       // EMBED
       // =====================================
 
       const embed =
         new EmbedBuilder()
 
-          // GRÜNE LINIE
-          .setColor(
-            '#7CFF00'
-          )
+          .setColor('#7CFF00')
 
           .setAuthor({
-
-            name:
-              'Top Gear Performance',
-
-            iconURL:
-              LOGO
-
+            name: 'Top Gear Performance',
+            iconURL: LOGO
           })
 
-          .setTitle(
-            '⚡ Xenon'
-          )
+          .setTitle('⚡ Xenon')
 
           .setDescription(
 
@@ -311,13 +294,11 @@ module.exports = (client) => {
 
           )
 
-          .setThumbnail(
-            LOGO
-          )
+          .setThumbnail(LOGO)
 
-          // HOCHGELADENES BILD
+          // BILD DIREKT AUS DEM ANHANG
           .setImage(
-            attachment.url
+            `attachment://${fileName}`
           )
 
           .setFooter({
@@ -336,18 +317,29 @@ module.exports = (client) => {
 
       // =====================================
       // XENON SENDEN
+      // BILD DIREKT MIT ANHÄNGEN
       // =====================================
 
       await channel.send({
 
         embeds: [
           embed
+        ],
+
+        files: [
+          {
+            attachment: attachment.url,
+            name: fileName
+          }
         ]
 
       });
 
 
-      // Temporäre Daten löschen
+      // =====================================
+      // TEMPORÄRE DATEN LÖSCHEN
+      // =====================================
+
       xenonData.delete(
         message.author.id
       );
